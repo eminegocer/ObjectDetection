@@ -27,5 +27,5 @@ This project focuses on object detection using Arduino, Raspberry Pi 4, and the 
 3. Install necessary Python libraries for YOLOv4 on the Raspberry Pi:
 ## Model Files
 The YOLO model files are stored externally due to size constraints. Download them from the following link:
-[Download YOLO Models]([https://drive.google.com/file/d/your-file-id/view?usp=sharing](https://drive.google.com/file/d/1YHB8XA6gKgN_wgjmSJKbKTTeveajuWFH/view))
+[Download YOLO Models](https://drive.google.com/file/d/1YHB8XA6gKgN_wgjmSJKbKTTeveajuWFH/view)
 
