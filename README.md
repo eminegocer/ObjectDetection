@@ -152,5 +152,23 @@ Buna karşılık genel kurumsal taramalar (örneğin ofis bilgisayarları, test 
 Bu senaryoda amaç şudur: “Mümkün olduğunca hızlı ve kapsamlı tarama yap.” Özellikle büyük ağlarda binlerce cihaz varsa, düşük performans ayarlarıyla tarama günler sürebilir. Bu yüzden burada hız önceliklidir.
 ________________________________________
 İki yaklaşımı zihninde şöyle ayırabilirsin: kritik sistemlerde Nessus “nazik” davranır, genel sistemlerde ise “agresif”. Yani aynı araç ama davranış şekli hedefe göre değişir.
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+scan policy, Nessus’un “nasıl tarayacağını” belirleyen ayar setidir. İçinde port tarama, plugin seçimi, credential kullanımı, performans ayarları gibi her şey vardır. 
+________________________________________
+Remote scan (unauthenticated): dışarıdan gelen bir saldırgan gibi davranır. Sisteme giriş yoktur, sadece açık servisler ve dış yüzey analiz edilir. Bu yüzden policy daha çok keşif ve servis bazlı zafiyetler üzerine kurulur.
+Bu tür bir policy oluştururken port tarama kısmını geniş tutmak gerekir. Sadece 1000 port değil, mümkünse tüm TCP portlarını taramak daha doğru olur çünkü kritik servisler bazen standart dışı portlarda çalışır. Servis keşfi (service detection) ve OS fingerprinting açık olmalı çünkü Nessus’un hangi zafiyeti deneyeceği buna bağlıdır.
+Plugin tarafında network servisleri, web server testleri, SSL/TLS kontrolleri ve genel bilgi toplama pluginleri aktif olmalı. SMB, FTP, SMTP gibi servisler için “unauthenticated” kontroller de açık kalmalıdır çünkü anonim erişim ya da yanlış konfigürasyonlar burada yakalanır.
+Ancak burada dikkat edilmesi gereken önemli bir nokta var: DoS (Denial of Service) ve brute force gibi agresif pluginler kapalı olmalı. Gerçek kurumlarda bu tür testler ayrı ve kontrollü yapılır. Ayrıca performans ayarları tamamen agresif değil, orta seviyede tutulur; çünkü dış sistemler de etkilenebilir.
+Özetle iyi bir remote policy, geniş yüzey tarar ama sistemi zorlamaz ve kimlik doğrulama yapmaz.
+________________________________________
+Credentialed scan tarafında ise yaklaşım tamamen değişir. Burada artık saldırgan değil, iç denetçi gibi davranırsın. Sisteme giriş yaparsın ve gerçek durumu görürsün. Bu yüzden bu policy çok daha derin ve kritik sonuçlar üretir.
+Bu policy’de en önemli şey credential tanımıdır. Windows için genelde domain admin veya local admin yetkisi, Linux için ise SSH üzerinden root ya da sudo yetkisi gerekir. Credential doğru değilse bu tarama neredeyse anlamını kaybeder.
+Plugin tarafında en kritik grup “Local Security Checks”tir. Çünkü bu pluginler sistemin içine girip hangi patch eksik, hangi CVE mevcut birebir kontrol eder. Bunun yanında Windows veya Linux’a özel pluginler, patch management kontrolleri ve configuration audit pluginleri aktif olmalıdır.
+Active Directory ortamında özellikle SMB, RPC ve LDAP tabanlı kontroller açık olmalıdır çünkü domain yapısındaki zafiyetler buradan çıkar. 
+Bu taramada performans ayarları genelde daha kontrollü yapılır. Çünkü sistem içine girildiği için fazla paralel işlem CPU ve disk yükü oluşturabilir. Ama yine de remote scan’e göre daha fazla veri toplandığı için süre biraz daha uzundur.
+________________________________________
+remote scan sana “dışarıdan ne görünüyor” sorusunun cevabını verir, credentialed scan ise “gerçekte içeride ne var” sorusunu cevaplar.
+Gerçek kurumsal ortamlarda bu iki policy birlikte kullanılır. Önce remote scan ile dış yüzey analiz edilir, ardından credentialed scan ile iç zafiyetler ortaya çıkarılır. 
 
 
