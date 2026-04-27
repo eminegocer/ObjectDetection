@@ -98,7 +98,17 @@ Elde edilen bulguların doğrulanması amacıyla sistem üzerinde yüklü günce
 
 Ek olarak, zafiyetin Remote Procedure Call üzerinden çalıştığı göz önünde bulundurularak hedef sistemlerde RPC servislerinin erişilebilir olduğu doğrulanır.
 
+Remediation (Çözüm Önerileri)
 
+Bu zafiyetin giderilmesi için öncelikle Microsoft Active Directory sistemlerine Microsoft tarafından yayınlanan Nisan 2026 güvenlik güncellemeleri uygulanmalıdır. İlgili KB paketlerinin (örneğin Server 2022 ve Server 2025 için yayınlanan yamalar) tüm Domain Controller sistemlere eksiksiz şekilde yüklenmesi gerekmektedir.
+
+Güncelleme sonrasında sistemlerin yeniden başlatılması ve yamaların başarıyla uygulandığının doğrulanması önerilir.
+
+Ek olarak, Remote Procedure Call erişimi mümkün olduğunca sınırlandırılmalı ve yalnızca gerekli sistemler arasında izin verilmelidir. Gereksiz RPC erişimleri firewall kuralları ile engellenmelidir.
+
+Ağ içerisinde Domain Controller sistemlere erişim sıkı şekilde kontrol edilmeli, yalnızca yetkili kullanıcıların ve sistemlerin erişimine izin verilmelidir. En az yetki prensibi uygulanarak kullanıcıların gereksiz haklara sahip olması engellenmelidir.
+
+Son olarak, anormal RPC trafiği ve şüpheli aktivitelerin tespit edilebilmesi için loglama ve izleme mekanizmaları aktif hale getirilmeli ve düzenli olarak incelenmelidir.
 
 
 
