@@ -90,6 +90,15 @@ Son adım DHCP ACK (Acknowledgement) aşamasıdır. DHCP sunucusu bu talebi onay
 Özetle DHCP, IP adresi yönetimini otomatikleştirerek ağ kurulumunu kolaylaştırır ve özellikle büyük ağlarda hataları ve yönetim yükünü ciddi şekilde azaltır.
 
 
+Zafiyetin doğrulanması, sistem üzerinde doğrudan istismar gerçekleştirilmeden, güvenli yöntemler kullanılarak yapılmalıdır. Öncelikle Microsoft Active Directory rolüne sahip Domain Controller sistemler hedef olarak belirlenir.
+
+Ardından Nessus kullanılarak credentialed scan gerçekleştirilir ve sistem üzerindeki güvenlik güncellemeleri analiz edilir. Tarama sonucunda, CVE-2026-33826 ile ilişkili güvenlik yamalarının eksik olup olmadığı kontrol edilir.
+
+Elde edilen bulguların doğrulanması amacıyla sistem üzerinde yüklü güncellemeler manuel olarak incelenir ve ilgili KB paketlerinin varlığı kontrol edilir.
+
+Ek olarak, zafiyetin Remote Procedure Call üzerinden çalıştığı göz önünde bulundurularak hedef sistemlerde RPC servislerinin erişilebilir olduğu doğrulanır.
+
+
 
 
 
