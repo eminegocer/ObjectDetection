@@ -33,84 +33,159 @@ The YOLO model files are stored externally due to size constraints. Download the
 
 
 
-Local Area Network (LAN) Topolojileri – Notlar
-Ağ dünyasında “topoloji” kavramı, bir ağın fiziksel veya mantıksal olarak nasıl tasarlandığını, yani cihazların birbirine nasıl bağlandığını ifade eder. Zaman içinde farklı ihtiyaçlara göre çeşitli topolojiler geliştirilmiş ve kullanılmıştır. Her topolojinin kendine özgü avantajları ve dezavantajları vardır; bu yüzden seçim yapılırken maliyet, ölçeklenebilirlik ve güvenilirlik gibi faktörler dikkate alınır.
-Star (Yıldız) Topolojisi
-Yıldız topolojisi günümüzde en yaygın kullanılan ağ yapılarından biridir. Bu yapıda tüm cihazlar (bilgisayarlar, yazıcılar vb.) merkezi bir cihaza bağlanır. Bu merkezi cihaz genellikle bir switch veya hub’dır. Ağdaki veri iletişimi doğrudan cihazlar arasında değil, bu merkezi cihaz üzerinden gerçekleşir. Yani bir cihazdan diğerine veri gönderildiğinde, veri önce merkezi cihaza gider, ardından hedef cihaza iletilir.
-Bu topolojinin en önemli avantajlarından biri güvenilirliktir. Çünkü ağdaki bir cihazın veya kablonun arızalanması genellikle sadece o cihazı etkiler, tüm ağı çökertmez. Ayrıca oldukça ölçeklenebilir bir yapıya sahiptir; yani ağa yeni cihazlar eklemek oldukça kolaydır. Bu da özellikle büyüyen işletmeler için büyük bir avantaj sağlar.
-Ancak yıldız topolojisinin bazı dezavantajları da vardır. Öncelikle, her cihazın merkezi cihaza ayrı ayrı bağlanması gerektiği için daha fazla kablo kullanılır ve bu da maliyeti artırır. Ayrıca switch veya hub gibi ek donanımların satın alınması gerekir. Ağ büyüdükçe bakım ihtiyacı da artar ve bu durum yönetimi zorlaştırabilir. Sorun giderme (troubleshooting) süreçleri de daha karmaşık hale gelebilir.
-En kritik noktalardan biri ise merkezi cihaza olan bağımlılıktır. Eğer switch veya hub arızalanırsa, ağa bağlı tüm cihazlar iletişimini kaybeder. Yani ağın tamamı çalışamaz hale gelir. Her ne kadar bu cihazlar genellikle dayanıklı olsa da, bu durum yıldız topolojisinin tek noktadan hata (single point of failure) riski taşıdığını gösterir.
 
-Bus (Veriyolu) Topolojisi 
-Bus topolojisi, tüm cihazların tek bir ana kabloya (backbone) bağlandığı bir ağ yapısıdır. Bu yapı, bir ağacın dalına bağlı yapraklar gibi düşünülebilir; yani tüm cihazlar tek bir hat üzerinden iletişim kurar. Ağdaki veri, bu ortak kablo boyunca ilerler ve hedef cihaza ulaşır.
-Bu topolojinin en önemli avantajlarından biri kurulumunun basit ve maliyetinin düşük olmasıdır. Ekstra ağ cihazlarına (örneğin switch gibi) ihtiyaç duyulmaması ve daha az kablolama gerektirmesi, özellikle küçük ve basit ağlar için ekonomik bir çözüm sunar.
-Ancak bu yapının bazı önemli dezavantajları vardır. Tüm veri trafiğinin tek bir kablo üzerinden gitmesi, ağda yoğunluk oluşmasına neden olabilir. Özellikle birden fazla cihaz aynı anda veri göndermek istediğinde performans düşer ve darboğaz (bottleneck) oluşur. Ayrıca tüm veri aynı hat üzerinden geçtiği için bir sorun oluştuğunda hangi cihazdan kaynaklandığını tespit etmek oldukça zorlaşır.
-Bus topolojisinin bir diğer kritik zayıflığı ise yedekliliğin (redundancy) olmamasıdır. Ana kablo (backbone) ağın tek iletişim yolu olduğu için bu kabloda meydana gelecek herhangi bir arıza tüm ağı etkiler. Kablo koparsa veya zarar görürse, ağa bağlı hiçbir cihaz veri gönderemez veya alamaz. Bu da bus topolojisini güvenilirlik açısından zayıf hale getirir.
+BlueHammer Zafiyeti
 
-Ring (Halka / Token) Topolojisi 
-Ring topolojisinde cihazlar birbirine doğrudan bağlanarak kapalı bir döngü (loop) oluşturur. Yani her cihaz iki komşu cihaza bağlıdır ve ağ bir halka şeklinde çalışır. Bu yapı, yıldız topolojisine kıyasla daha az kablolama gerektirir ve merkezi bir cihaza olan bağımlılığı azaltır.
-Bu topolojide veri, halka boyunca sırayla ilerleyerek hedef cihaza ulaşır. Verinin iletilmesi sırasında her cihaz, kendisine gelen veriyi bir sonraki cihaza aktarır. İlginç bir çalışma mantığı vardır: Eğer bir cihazın kendi göndereceği verisi yoksa, gelen veriyi iletir; ancak kendi verisi varsa önce onu gönderir, ardından diğer verileri iletmeye devam eder. Bu mekanizma genellikle “token” mantığı ile ilişkilendirilir.
-Ring topolojisinin avantajlarından biri, veri akış yönünün tek olması sayesinde hata tespitinin nispeten kolay olmasıdır. Veri belirli bir yol izlediği için, bir sorun oluştuğunda hangi noktada problem olduğu daha rahat anlaşılabilir. Ayrıca aynı anda tüm cihazlar veri göndermediği için bus topolojisindeki gibi ciddi darboğaz problemleri daha az görülür.
-Bununla birlikte bazı dezavantajları da vardır. Verinin hedefe ulaşabilmesi için bazen birçok cihazdan geçmesi gerekir, bu da verimliliği düşürebilir ve gecikmelere neden olabilir. En önemli sorunlardan biri ise ağın kırılgan yapısıdır: Eğer halkadaki bir kablo koparsa veya bir cihaz arızalanırsa, tüm ağ iletişimi durabilir. Yani tek bir arıza tüm sistemi etkileyebilir.
+Cloud Files API ve dosya kilitleme (opportunistic locking) mekanizmalarının etkileşiminden kaynaklanan bir yerel ayrıcalık yükseltme (Local Privilege Escalation - LPE) zafiyetidir. Bu zafiyet, normal bir kullanıcı yetkisine sahip bir saldırganın, sistem bileşenlerinin belirli bir zamanlama hatasından yararlanarak NT AUTHORITY\SYSTEM seviyesine yükselmesine olanak tanımaktadır. Temel problem, Defender’ın güncelleme veya tarama süreçleri sırasında VSS tarafından oluşturulan sistem anlık görüntüsünün (snapshot) erişim penceresinin, Cloud Files callback ve dosya kilitleme mekanizmalarıyla birlikte manipüle edilebilmesidir. Bu durum, kritik sistem dosyalarının (SAM, SYSTEM, SECURITY hive’ları) snapshot üzerinden erişilebilir hale gelmesine ve saldırganın yerel kimlik doğrulama verilerini elde ederek sistem üzerinde tam kontrol sağlamasına yol açmaktadır. Zafiyet birden fazla meşru Windows bileşeninin öngörülmeyen şekilde bir araya gelmesinden kaynaklanan bir tasarım ve zamanlama (race condition) problemidir.
 
-Switch Nedir?
-Switch (anahtar), bir ağ içerisinde birden fazla cihazı birbirine bağlamak için kullanılan temel ağ cihazlarından biridir. Bilgisayarlar, yazıcılar ve diğer ağ destekli cihazlar ethernet kabloları aracılığıyla switch üzerindeki portlara bağlanır. Switch’ler genellikle 4, 8, 16, 24, 32 veya 64 port gibi farklı kapasitelere sahip olabilir ve bu sayede çok sayıda cihazın tek bir ağda toplanmasını sağlar.
-Switch’lerin en önemli özelliklerinden biri, ağ trafiğini akıllı bir şekilde yönetmesidir. Bir switch, hangi cihazın hangi porta bağlı olduğunu bilir. Bu sayede bir veri paketi aldığında, bu paketi tüm portlara göndermek yerine sadece hedef cihaza iletir. Bu durum, ağı gereksiz veri trafiğinden kurtarır ve performansı önemli ölçüde artırır. Bu yönüyle switch’ler, daha basit çalışan hub veya repeater gibi cihazlara göre çok daha verimlidir.
-Ayrıca switch’ler ve router’lar birbirine bağlanarak daha büyük ve dayanıklı ağ yapıları oluşturulabilir. Bu bağlantılar sayesinde ağda birden fazla veri yolu (path) oluşur. Eğer bu yollardan biri kesilirse, veri alternatif bir yol üzerinden iletilmeye devam eder. Bu durum ağın güvenilirliğini (redundancy) artırır. Her ne kadar veri bazen daha uzun bir yol izlemek zorunda kalabileceği için performansta küçük düşüşler yaşanabilse de, ağın tamamen kesilmemesi büyük bir avantaj sağlar.
-Router Nedir?
-outer (yönlendirici), farklı ağları birbirine bağlayan ve bu ağlar arasında veri iletimini sağlayan temel bir ağ cihazıdır. En basit haliyle, bir yerel ağı (örneğin ev veya ofis ağı) internet gibi başka bir ağa bağlar. Router’ın görevi, gelen veriyi doğru hedefe ulaştırmak için en uygun yolu belirlemek ve bu veri paketlerini ilgili ağa iletmektir.
-Bu işlem “routing” (yönlendirme) olarak adlandırılır. Routing, verinin bir kaynaktan çıkıp hedefe ulaşana kadar geçtiği yolun belirlenmesi sürecidir. Router, ağlar arasında birden fazla yol (path) varsa, bu yollar arasından en uygun olanı seçerek verinin doğru ve verimli şekilde iletilmesini sağlar. Bu seçim; hız, mesafe veya ağ yoğunluğu gibi faktörlere bağlı olabilir.
-Router’lar özellikle birden fazla ağın bulunduğu yapılarda büyük önem taşır. Örneğin bir ofis ağı ile internet arasında veri alışverişi router sayesinde gerçekleşir. Aynı şekilde büyük ağlarda birden fazla router kullanılarak alternatif yollar oluşturulabilir. Bu da ağın daha dayanıklı olmasını sağlar; çünkü bir yol kesildiğinde veri başka bir yol üzerinden iletilmeye devam eder.
-Kısaca özetlemek gerekirse, switch’ler aynı ağ içindeki cihazları birbirine bağlarken, router’lar farklı ağları birbirine bağlar ve verinin bu ağlar arasında doğru şekilde ilerlemesini sağlar.
-Subnetting (Alt Ağlara Bölme)
-Subnetting, bir ağı daha küçük ve yönetilebilir parçalara (alt ağlara) bölme işlemidir. Temel amaç, büyük bir ağ yapısını daha düzenli hale getirmek ve farklı ihtiyaçlara göre bölümlendirmektir
-Gerçek hayatta özellikle işletmelerde farklı departmanlar bulunur (örneğin muhasebe, finans, insan kaynakları). Ağlarda da benzer bir mantık vardır. Network yöneticileri subnetting kullanarak her departman için ayrı ağ bölümleri oluşturur ve böylece verinin doğru yere gitmesini sağlar.
-Subnetting işlemi, IP adreslerinin ve subnet mask denilen bir yapının birlikte kullanılmasıyla gerçekleştirilir. IP adresi ve subnet mask, 32 bitlik (4 oktetli) bir yapıdadır ve her oktet 0 ile 255 arasında bir değer alır. Subnet mask, ağın hangi kısmının “network”, hangi kısmının “host” olduğunu belirlemeye yarar. Yani bir IP adresinin hangi ağa ait olduğunu ve o ağ içindeki hangi cihaza ait olduğunu ayırır.
-Bir subnet içinde IP adresleri üç temel rol için kullanılır:
-İlk olarak network address (ağ adresi), ağın başlangıcını temsil eder ve o ağın kimliğini belirler. Örneğin 192.168.1.100 IP adresine sahip bir cihaz, 192.168.1.0 ağı içinde yer alır. Buradaki 192.168.1.0 ifadesi tüm ağı temsil eden başlangıç adresidir.
-İkinci olarak host address (host adresi), ağ içindeki bireysel cihazları tanımlamak için kullanılır. Aynı ağda bulunan her cihazın kendine özgü bir host adresi vardır. Örneğin 192.168.1.100 bu ağdaki belirli bir bilgisayarı ifade eder.
-Üçüncü olarak default gateway (varsayılan ağ geçidi), farklı ağlara çıkış yapmak için kullanılan özel bir IP adresidir. Eğer bir cihaz aynı ağ dışında bir hedefe veri göndermek isterse, bu veri önce default gateway’e gönderilir. Genellikle router bu görevi üstlenir ve çoğunlukla .1 veya .254 gibi ilk ya da son kullanılabilir IP adreslerinden biri bu amaçla seçilir (örneğin 192.168.1.254).
-Ev ağları gibi küçük yapılarda genellikle tek bir subnet bulunur çünkü aynı anda çok fazla cihaza ihtiyaç duyulmaz. Ancak işletmelerde yüzlerce hatta binlerce cihaz bulunduğu için subnetting zorunlu hale gelir. Bilgisayarlar, yazıcılar, kameralar ve sensörler farklı subnetlere ayrılarak hem yönetim kolaylaştırılır hem de ağ daha verimli çalışır.
-Subnetting’in en önemli faydalarından biri güvenliktir. Subnetting sayesinde ağlar birbirinden tamamen ayrılır. Böylece farklı departmanlar birbirinin sistemine erişemez, ancak her ikisi de internet bağlantısını kullanabilir.
-Özetle subnetting; ağları daha düzenli, daha güvenli ve daha verimli hale getirmek için kullanılan, IP adresleme mantığına dayalı bir bölümlendirme yöntemidir.
-Basit senaryo
-1.	PC → paketi default gateway’e gönderir 
-2.	Router (gateway) paketi alır 
-3.	Router NAT yapar (192.168.1.10 → public IP) 
-4.	Paket internete çıkar
+Etki Noktaları:
+•	Kurumsal endpoint cihazları (Domain’e bağlı kullanıcı bilgisayarları)
+Standart kullanıcı yetkisine sahip domain-joined workstation’lar üzerinden saldırı başlatılabildiği için kurumsal istemci ortamları yüksek risk altındadır.
+•	Defender Antivirus aktif Windows sunucuları
+Defender ve VSS bileşenleri aktif olan Windows Server sistemleri (özellikle dosya sunucuları ve uygulama sunucuları) etkilenebilir.
+•	Yedekleme / snapshot kullanılan sistemler (VSS bağımlı altyapılar)
+Volume Shadow Copy kullanan backup agent’ları veya sistem geri yükleme aktif olan sunucular, snapshot manipülasyonu nedeniyle risk altındadır.
+•	Cloud Files API kullanan senkronizasyon altyapısına sahip sistemler
+OneDrive / benzeri sync altyapıları bulunan ve Cloud Files callback mekanizmasını destekleyen Windows ortamları saldırı zincirinin bir parçası olabilir
+•	Least privilege kullanıcıların erişim sağlayabildiği çok kullanıcılı sistemler
+Birden fazla düşük yetkili kullanıcının erişebildiği paylaşımlı sistemlerde saldırı yüzeyi artar (örneğin eğitim, lab, terminal server ortamları).
 
-DHCP (Dynamic Host Configuration Protocol) 
-IP adresleri bir cihaza iki şekilde atanabilir: manuel olarak (statik IP) ya da otomatik olarak DHCP sunucusu üzerinden. Manuel atamada ağ yöneticisi IP adresini elle girer. Ancak büyük ağlarda bu yöntem pratik olmadığı için genellikle DHCP kullanılır.
-DHCP, ağa yeni bağlanan cihazlara otomatik olarak IP adresi ve gerekli ağ bilgilerini (subnet mask, default gateway gibi) dağıtan bir sistemdir. Böylece her cihazın ayrı ayrı manuel ayarlanmasına gerek kalmaz.
-Bir cihaz ağa bağlandığında ve IP adresi yoksa, DHCP süreci otomatik olarak başlar. Bu süreç dört aşamadan oluşur ve genellikle “DORA” olarak hatırlanır:
-İlk adım DHCP Discover aşamasıdır. Cihaz, ağda bir DHCP sunucusu olup olmadığını bulmak için bir yayın (broadcast) mesajı gönderir. Bu mesaj “Bana IP verebilecek bir DHCP var mı?” şeklinde düşünülebilir.
-İkinci adım DHCP Offer aşamasıdır. Ağda bir DHCP sunucusu varsa, cihaza kullanılabilir bir IP adresi teklif eder. Bu teklif, aynı zamanda bazı ek ağ bilgilerini de içerebilir.
-Üçüncü adım DHCP Request aşamasıdır. Cihaz, sunucunun teklif ettiği IP adresini kabul ettiğini belirtmek için bir yanıt gönderir. Bu aşamada cihaz artık o IP’yi kullanmak istediğini doğrular.
-Son adım DHCP ACK (Acknowledgement) aşamasıdır. DHCP sunucusu bu talebi onaylar ve IP adresini resmi olarak cihaza tahsis eder. Bu andan itibaren cihaz artık ağda bu IP ile aktif olarak iletişim kurabilir.
-Özetle DHCP, IP adresi yönetimini otomatikleştirerek ağ kurulumunu kolaylaştırır ve özellikle büyük ağlarda hataları ve yönetim yükünü ciddi şekilde azaltır.
+Olası Saldırı Sonuçları:
+•	Sistem üzerinde tam kontrol elde edilmesi (SYSTEM yetkisi kazanımı)
+Saldırgan, yerel kullanıcıdan NT AUTHORITY\SYSTEM seviyesine yükselerek işletim sistemi üzerinde en yüksek yetkiyi elde edebilir. 
+•	Kimlik bilgisi hırsızlığı (Credential Dumping)
+SAM ve SYSTEM hive’ları üzerinden NTLM hash’leri ve yerel kullanıcı parolaları elde edilerek kimlik doğrulama verileri çalınabilir. 
+•	Yetkili hesapların ele geçirilmesi
+Yerel Administrator hesapları dahil olmak üzere tüm yerel hesaplar üzerinde kontrol sağlanabilir ve kimlik taklidi yapılabilir. 
+•	Yan hareket (Lateral Movement) imkânı
+Ele geçirilen kimlik bilgileri ile domain ortamında diğer sistemlere geçiş yapılabilir. 
+•	Hassas veri sızıntısı (Data exfiltration)
+Sistem içindeki dosyalar, kullanıcı verileri ve uygulama konfigürasyonları saldırgan tarafından erişilip dışarı aktarılabilir. 
+•	Sistem bütünlüğünün bozulması
+Kritik sistem dosyalarının değiştirilmesi, servislerin manipüle edilmesi veya güvenlik yapılandırmalarının devre dışı bırakılması mümkündür. 
+
+Zafiyetin Doğrulanması
+BlueHammer zafiyeti, imza tabanlı bir yazılım hatasından ziyade Windows bileşenleri arasındaki etkileşimden kaynaklanan bir tasarım kusuru olduğu için, klasik vulnerability scanner araçları (örneğin Nessus) tarafından doğrudan “exploit tespiti” şeklinde işaretlenmeyebilir. Bu nedenle doğrulama süreci, hem otomatik tarama hem de davranışsal analiz kombinasyonu ile gerçekleştirilmelidir.
+Nessus Tabanlı Ön Değerlendirme
+Nessus credentialed scan kullanılarak hedef sistem analiz edilmelidir. Bu aşamada amaç zafiyeti doğrudan tespit etmek değil, saldırı yüzeyinin uygunluğunu belirlemektir.
+•	Windows sisteminde Microsoft Defender servisinin aktif olup olmadığı kontrol edilir 
+•	Volume Shadow Copy Service (VSS) yapılandırması ve erişilebilirliği analiz edilir 
+•	Cloud Files API ve sync root mekanizmalarının mevcut olup olmadığı incelenir 
+•	Kullanıcı yetki seviyeleri ve local privilege escalation’a uygun yapı kontrol edilir 
+Nessus tarafında özellikle Windows enumeration ve misconfiguration plugin sonuçları değerlendirilerek sistemin BlueHammer saldırı zincirine uygun bir ortam olup olmadığı analiz edilir.
+
+Davranışsal ve Manuel Doğrulama
+Sistem üzerinde manuel doğrulama gerçekleştirilir. Bu aşamada amaç exploit çalıştırmak değil, zafiyet için gerekli bileşenlerin davranışlarını gözlemlemektir.
+•	Defender servisinin aktif olduğu ve sistemde tarama/güncelleme süreçlerinin çalıştığı doğrulanır 
+•	VSS servisinin çalışır durumda olduğu ve shadow copy oluşturabilme kapasitesi kontrol edilir 
+•	Cloud Files API çağrılarının sistemde mevcut olduğu tespit edilir 
+•	Standart kullanıcı hesabının bu bileşenlere erişim seviyeleri analiz edilir 
+Bu kontroller sırasında özellikle sistemin snapshot oluşturma davranışı ve kullanıcı süreçlerinin bu süreçlerle etkileşimi gözlemlenir.
 
 
-Zafiyetin doğrulanması, sistem üzerinde doğrudan istismar gerçekleştirilmeden, güvenli yöntemler kullanılarak yapılmalıdır. Öncelikle Microsoft Active Directory rolüne sahip Domain Controller sistemler hedef olarak belirlenir.
+Davranışsal Log Analizi (EDR / Event Logs)
+Doğrulama sürecinin kritik bir parçası da log tabanlı analizdir:
+•	Windows Defender Operational logları incelenir 
+•	VSS snapshot oluşturma olayları takip edilir 
+•	Cloud Files API ile ilgili erişim ve callback aktiviteleri kontrol edilir 
+•	Event ID 4723 / 4724 gibi yerel kullanıcı parola değişiklik olayları izlenir 
+•	Standart kullanıcı süreçlerinden gelen servis oluşturma (CreateService) girişimleri analiz edilir 
 
-Ardından Nessus kullanılarak credentialed scan gerçekleştirilir ve sistem üzerindeki güvenlik güncellemeleri analiz edilir. Tarama sonucunda, CVE-2026-33826 ile ilişkili güvenlik yamalarının eksik olup olmadığı kontrol edilir.
+Etkilenen Sürümler
+BlueHammer zafiyeti, belirli bir yazılım hatasından ziyade Windows’un modern mimarisinde yer alan bileşenlerin etkileşiminden kaynaklandığı için aşağıdaki işletim sistemi sürümlerini potansiyel olarak etkiler:
+•	Windows 10 (1909 ve sonrası tüm desteklenen sürümler) 
+•	Windows 11 (tüm güncel ve desteklenen sürümler) 
+•	Microsoft Defender Antivirus’in aktif olduğu Windows kurulumları 
+•	Volume Shadow Copy Service (VSS) aktif olan sistemler 
+•	Cloud Files API (CfAPI) desteği bulunan Windows build’leri 
+•	Kurumsal ve bireysel tüm Windows client workstation ortamları
 
-Elde edilen bulguların doğrulanması amacıyla sistem üzerinde yüklü güncellemeler manuel olarak incelenir ve ilgili KB paketlerinin varlığı kontrol edilir.
 
-Ek olarak, zafiyetin Remote Procedure Call üzerinden çalıştığı göz önünde bulundurularak hedef sistemlerde RPC servislerinin erişilebilir olduğu doğrulanır.
-
-Remediation (Çözüm Önerileri)
-
-Bu zafiyetin giderilmesi için öncelikle Microsoft Active Directory sistemlerine Microsoft tarafından yayınlanan Nisan 2026 güvenlik güncellemeleri uygulanmalıdır. İlgili KB paketlerinin (örneğin Server 2022 ve Server 2025 için yayınlanan yamalar) tüm Domain Controller sistemlere eksiksiz şekilde yüklenmesi gerekmektedir.
-
-Güncelleme sonrasında sistemlerin yeniden başlatılması ve yamaların başarıyla uygulandığının doğrulanması önerilir.
-
-Ek olarak, Remote Procedure Call erişimi mümkün olduğunca sınırlandırılmalı ve yalnızca gerekli sistemler arasında izin verilmelidir. Gereksiz RPC erişimleri firewall kuralları ile engellenmelidir.
-
-Ağ içerisinde Domain Controller sistemlere erişim sıkı şekilde kontrol edilmeli, yalnızca yetkili kullanıcıların ve sistemlerin erişimine izin verilmelidir. En az yetki prensibi uygulanarak kullanıcıların gereksiz haklara sahip olması engellenmelidir.
-
-Son olarak, anormal RPC trafiği ve şüpheli aktivitelerin tespit edilebilmesi için loglama ve izleme mekanizmaları aktif hale getirilmeli ve düzenli olarak incelenmelidir.
+Çözüm Önerileri:
+BlueHammer zafiyeti klasik bir yazılım hatasından ziyade Windows bileşenlerinin etkileşiminden kaynaklanan bir tasarım problemi olduğu için tek bir “patch” yaklaşımı yeterli değildir. Bu nedenle çözüm, hem Microsoft seviyesinde güncellemeleri hem de sistem yöneticisi seviyesinde güvenlik sertleştirme (hardening) önlemlerini içermelidir.
+•	Güncellemeler: Windows ve Microsoft Defender en güncel sürüme yükseltilmeli, özellikle VSS, Defender ve Cloud Files bileşenlerine yönelik güvenlik yamaları düzenli olarak uygulanmalıdır. 
+•	Yetki kısıtlaması (Least Privilege): Kullanıcılara gereksiz admin yetkisi verilmemeli, Cloud Files API ve VSS gibi kritik bileşenlere standart kullanıcı erişimi sınırlandırılmalıdır. 
+•	Davranışsal izleme: Standart kullanıcı süreçlerinden gelen VSS erişimleri, Cloud Files API çağrıları ve servis oluşturma (CreateService) girişimleri SIEM/EDR üzerinde anomali olarak izlenmelidir. Özellikle ardışık yerel admin parola değişiklikleri (Event ID 4723/4724) kontrol edilmelidir. 
+•	Sistem sertleştirme: VSS ve Cloud Files erişimi yalnızca sistem servisleriyle sınırlandırılmalı, gereksiz Windows bileşenleri kapatılmalı ve kritik sistemlerde sıkı uygulama kontrolü (WDAC/AppLocker) uygulanmalıdır.
 
 
 
+Nessus üzerinde “Windows Local Privilege Escalation”, “Microsoft Defender Security Bypass” veya “Shadow Copy / VSS exposure” kategorilerine ait plugin’ler (Windows Local Privilege Escalation Checks, Microsoft Windows Defender Detection Plugins vs.) çalıştırılarak sistemde bilinen zayıf yapılandırmalar, eksik yamalar veya riskli servis davranışları kontrol edilir. Ayrıca sistemde Defender güncelleme mekanizması, shadow copy servis durumu ve kullanıcı yetki seviyeleri ile ilgili güvenlik kontrollerinin yanlış yapılandırılıp yapılandırılmadığı raporlanır.
+Manuel doğrulama kapsamında hedef sistemde standart kullanıcı yetkisine sahip bir hesap ile oturum açılır ve Defender güncelleme/tarama süreçleri sırasında VSS snapshot oluşumu gözlemlenir. Bu süreçte Event Viewer (Windows Event Logs), özellikle Defender (Microsoft-Windows-Windows Defender/Operational) ve VSS logları incelenerek snapshot oluşturma ve dosya erişim aktiviteleri doğrulanır.
+Ek olarak, Cloud Files API ile ilişkili aktiviteler ve oplock mekanizmalarının tetiklenip tetiklenmediği Process Monitor (Sysinternals) veya benzeri izleme araçları ile analiz edilir. Şüpheli durumlar arasında kullanıcı süreçlerinin shadow copy cihaz yollarına erişim denemeleri, sistem hive dosyalarına (SAM, SYSTEM, SECURITY) yönelik erişim girişimleri ve Defender süreçlerinin bekleme/delay durumuna girmesi yer alır.
 
+
+
+
+
+Adobe Acrobat Zafiyeti
+Bu zafiyet, Adobe Acrobat Reader uygulamasında bulunan ve henüz yamalanmamış (zero-day) bir güvenlik açığının, kötü amaçlı hazırlanmış PDF dosyaları aracılığıyla istismar edilmesiyle ortaya çıkan bir uzaktan kod çalıştırma (RCE) ve sandbox bypass riski oluşturmaktadır.
+Saldırı, kullanıcı etkileşimi minimum seviyede olacak şekilde tasarlanabilmektedir; hedef kullanıcı yalnızca zararlı PDF dosyasını açtığında exploit tetiklenmektedir. PDF içerisine gömülü JavaScript kodları ve Acrobat’ın yerleşik API fonksiyonlarının kötüye kullanılması sayesinde saldırgan, yerel dosya sistemine erişim sağlayabilmekte ve sistem hakkında bilgi toplayabilmektedir.
+Bu zafiyetin temel risk noktası, Adobe Acrobat Reader’ın PDF işleme motoru içerisinde bulunan meşru fakat geniş yetkilere sahip API’lerin (örneğin dosya okuma ve ağ iletişimi sağlayan fonksiyonlar) yeterince kısıtlanmadan çalıştırılabilmesidir. Saldırgan bu API’leri kullanarak:
+•	Yerel dosyaları okuyabilmekte 
+•	Sistem ve kullanıcı ortamını keşfedebilmekte 
+•	Toplanan verileri dış bir sunucuya iletebilmektedir 
+Daha ileri saldırı senaryolarında ise bu zafiyet, sandbox izolasyonunun aşılması ile birleştiğinde uzaktan komut çalıştırma (RCE) seviyesine kadar ilerleyebilmekte ve hedef sistemin tamamen ele geçirilmesine yol açabilmektedir.
+Zafiyet özellikle phishing kampanyaları ile dağıtılan PDF dosyaları üzerinden aktif olarak istismar edilmekte olup, tespit edilmesi zor bir yapıya sahiptir çünkü saldırı akışı, Adobe Acrobat’ın normal çalışma davranışları ile büyük ölçüde örtüşmektedir.
+
+
+Etki Noktaları:
+•	Son Kullanıcı Sistemleri (Endpoint’ler)
+•	Yerel Dosya Sistemi (Local File System)
+•	Acrobat Reader Sandbox Ortamı
+•	Kullanıcı Hesapları ve Kimlik Bilgileri
+
+
+Olası Saldırı Sonuçları
+•	Hassas Veri Sızıntısı (Information Disclosure)
+Kullanıcıya ait tüm yerel ve tarayıcı tabanlı hassas veriler ifşa olabilir.
+
+•	Kimlik Bilgisi Hırsızlığı (Credential Theft)
+•	Sistem Bilgisi Toplanması (System Reconnaissance)
+•	Sandbox Bypass
+•	Veri Sızdırma
+•	Yatay Yayılım (Lateral Movement)
+
+Zafiyetin Doğrulanması
+Nessus ile Doğrulama
+Nessus üzerinde credentialed scan kullanılarak hedef sistemler analiz edilmelidir. Bu aşamada temel amaç, Adobe Acrobat Reader uygulamasının etkilenen sürümde olup olmadığını ve sistemin genel saldırı yüzeyinin exploit zincirine uygunluğunu belirlemektir.
+Bu kapsamda Nessus tarafından aşağıdaki kontroller değerlendirilir:
+•	Hedef sistemde kurulu Adobe Acrobat Reader sürümü tespit edilir ve vulnerability feed ile karşılaştırılır 
+•	Windows Installed Software Enumeration üzerinden Acrobat kurulum bilgileri analiz edilir 
+•	Patch seviyesinin güncel olup olmadığı kontrol edilir 
+•	JavaScript execution desteğinin aktif olduğu Acrobat yapılandırmaları tespit edilir 
+•	Protected Mode (sandbox) özelliğinin aktif veya devre dışı durumu değerlendirilir 
+•	Kullanıcı yetki seviyesi (local admin / standard user) analiz edilerek saldırının etki potansiyeli belirlenir 
+Nessus çıktıları bu aşamada doğrudan exploit doğrulaması sağlamaz; bunun yerine sistemin “vulnerable configuration” içerip içermediğini ve Adobe tarafından yayınlanan güvenlik yamalarına karşı güncel olup olmadığını ortaya koyar. Eğer kurulu sürüm etkilenen versiyon aralığında yer alıyorsa sistem “potansiyel olarak vulnerable” olarak sınıflandırılır.
+
+Davranışsal Doğrulama
+Nessus sonuçlarının doğrulanması için kontrollü test ortamlarında davranışsal analiz yapılması önerilir. Bu aşamada amaç exploit’in aktif olarak tetiklenip tetiklenmediğini gözlemlemektir.
+Bu kapsamda:
+•	Kontrollü bir PDF dosyasının Acrobat Reader üzerinde açılması sırasında process davranışı izlenir 
+•	Sysmon veya Procmon kullanılarak Acrobat process’inin dosya sistemi erişimleri analiz edilir 
+•	Şüpheli Acrobat API çağrıları ve beklenmeyen local file access girişimleri gözlemlenir 
+•	PDF açıldıktan sonra oluşan HTTP/DNS trafiği Wireshark gibi araçlarla incelenir 
+•	Sandbox bypass şüphesi oluşturacak sistem seviyesi process spawn davranışları kontrol edilir
+Etkilenen Sistemler 
+•	Adobe Acrobat Reader DC (Continuous Track) üzerinde güncel güvenlik yamaları uygulanmamış sürümler 
+•	2025 yılı ve öncesinde yayımlanmış, Adobe security update almamış Acrobat Reader DC build’leri 
+•	Windows, macOS ve Linux üzerinde çalışan Acrobat Reader kurulumları 
+•	E-posta, web indirmesi veya dosya paylaşım platformları üzerinden PDF açan tüm uç kullanıcı sistemleri 
+•	Kurumsal ortamda merkezi güncelleme yapılmamış endpoint cihazları 
+•	Protected Mode (Sandbox) devre dışı bırakılmış veya kısıtlı yapılandırılmış sistemler 
+
+Çözüm Önerileri
+•	Adobe Acrobat Reader uygulaması en güncel güvenlik yamaları uygulanmış sürüme yükseltilmelidir 
+•	Eski ve güvenlik açığı içeren Acrobat Reader sürümleri sistemlerden tamamen kaldırılmalıdır 
+•	Kurumsal ortamlarda merkezi yazılım yönetimi (Intune, SCCM vb.) ile standart ve güncel sürüm dağıtımı yapılmalıdır 
+•	Adobe Acrobat Reader için otomatik güncelleme mekanizması aktif hale getirilmelidir
+
+Güvenlik Sertleştirme (Hardening) Önerileri
+•	Adobe Acrobat Reader içerisinde JavaScript çalıştırma özelliği devre dışı bırakılmalıdır 
+•	Protected Mode (Sandbox) özelliği etkin hale getirilmelidir 
+•	Protected View ayarı “tüm PDF dosyaları için” aktif edilmelidir 
+•	PDF dosyalarının varsayılan olarak kısıtlı modda açılması sağlanmalıdır 
+•	Acrobat Reader uygulamasının outbound (dışa giden) ağ trafiği sınırlandırılmalıdır 
+•	Kurumsal firewall üzerinden Acrobat süreçleri için gereksiz internet erişimi kısıtlanmalıdır 
+•	Endpoint seviyesinde EDR çözümleri ile Acrobat davranışları izlenmelidir
 
